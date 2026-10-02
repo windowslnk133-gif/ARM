@@ -7,31 +7,46 @@ $savePath = "$env:TEMP\ARM_Setup.7z"
 $desktopDir = "$env:USERPROFILE\Desktop\ARM_App"
 
 Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "  installing (91MB)" -ForegroundColor Cyan
+Write-Host "  Install ARM (91MB)" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 
-# 2. 開始下載檔案（這裡已修正為正確的 -OutFile）
+# 2. 開始下載檔案
 try {
     Invoke-WebRequest -Uri $url -OutFile $savePath -UserAgent "Mozilla/5.0"
 } catch {
-    Write-Error "install error"
+    Write-Error "Install Erorr"
     exit
 }
 
-# 3. 自動建立桌面資料夾並解壓 .7z 檔案
+# 3. 強制建立桌面目標資料夾 (確保它絕對存在)
 if (!(Test-Path $desktopDir)) { 
-    New-Item -ItemType Directory -Path $desktopDir | Out-Null 
+    New-Item -ItemType Directory -Path $desktopDir -Force | Out-Null 
 }
 
-Write-Host "install on [ARM_App] ..." -ForegroundColor Yellow
-tar -xf $savePath -C $desktopDir
+Write-Host "Install To Desktop [ARM_App] ..." -ForegroundColor Yellow
 
-# 4. 刪除暫存的壓縮檔
+# 4. 採用 Windows Shell 核心解壓，保證檔案一定會乖乖降落到桌面資料夾
+try {
+    $shell = New-Object -ComObject Shell.Application
+    $zipFolder = $shell.NameSpace($savePath)
+    $destFolder = $shell.NameSpace($desktopDir)
+    $destFolder.CopyHere($zipFolder.Items(), 16)
+} catch {
+    # 如果舊電腦不支援，使用備用解包指令
+    tar -xf $savePath -C $desktopDir
+}
+
+# 5. 刪除暫存的壓縮檔
 if (Test-Path $savePath) {
-    Remove-Item $savePath
+    Remove-Item $savePath -Force
 }
 
-Write-Host ""
+# 6. 強制重新整理桌面，讓圖示立刻顯示出來
+$shellApp = New-Object -ComObject Shell.Application
+$shellApp.Namespace(0).Self.InvokeVerb("Properties") | Out-Null
+
+Write-Host "=========================================="
 Write-Host "[Notification] Success" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Green
+
 
