@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>複製文字的網站</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .container {
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>複製文字的網站</h1>
+    <input type="text" id="textToCopy" placeholder="irm  | iex">
+    <button onclick="copyText()">複製文字</button>
+    <p id="status"></p>
+</div>
+
+<script>
+    function copyText() {
+        var textToCopy = document.getElementById('textToCopy').value;
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                document.getElementById('status').textContent = '文字已複製到剪貼簿！';
+                document.getElementById('status').style.color = 'green';
+            })
+            .catch(() => {
+                document.getElementById('status').textContent = '無法複製文字到剪貼簿！';
+                document.getElementById('status').style.color = 'red';
+            });
+    }
+</script>
+
+</body>
+</html>
